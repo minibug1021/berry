@@ -38,4 +38,7 @@ asyncio https://pypi.python.org/pypi/asyncio/3.4.3
 
 node.js https://nodejs.org/en/
 
-Make sure to change the password in the config to the server id.
+Make sure to change the password in the IRC Bot Config to the Discord Server ID.
+Add the Discord bot token to discord.py and the config.js file.
+
+Then run main.py, server.js, and discord.py
