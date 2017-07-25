@@ -1,6 +1,7 @@
 {
     "channels": "#bottest,#bottestsfw,#bottestsfw2",
     "debug": false,
+    "password": None,
     "googleKey": "",
     "googleengine": "015980026967623760357:olr5wqcaob8",
     "imgurKey": "",
