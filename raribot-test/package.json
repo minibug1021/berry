@@ -1,0 +1,55 @@
+{
+  "_from": "git+https://github.com/creesch/discordIRCd.git",
+  "_id": "discord-ircd@0.5.0",
+  "_inBundle": false,
+  "_integrity": "sha1-BQhtEN9sbm94h5+ddB2DKQSgWGw=",
+  "_location": "/discord-ircd",
+  "_phantomChildren": {},
+  "_requested": {
+    "type": "git",
+    "raw": "https://github.com/creesch/discordIRCd.git",
+    "rawSpec": "https://github.com/creesch/discordIRCd.git",
+    "saveSpec": "git+https://github.com/creesch/discordIRCd.git",
+    "fetchSpec": "https://github.com/creesch/discordIRCd.git",
+    "gitCommittish": "master"
+  },
+  "_requiredBy": [
+    "#USER",
+    "/"
+  ],
+  "_resolved": "git+https://github.com/creesch/discordIRCd.git#04e14d3e45ece45796d9598e6d9b24adade8ee7e",
+  "_spec": "https://github.com/creesch/discordIRCd.git",
+  "_where": "C:\\Users\\minibug\\Desktop",
+  "author": {
+    "name": "creesch"
+  },
+  "bugs": {
+    "url": "https://github.com/creesch/discordIRCd/issues"
+  },
+  "bundleDependencies": false,
+  "dependencies": {
+    "bufferutil": "^3.0.0",
+    "discord.js": "^11.0.0",
+    "erlpack": "github:hammerandchisel/erlpack",
+    "request": "^2.81.0"
+  },
+  "deprecated": false,
+  "description": "Allows you to connect to discord with your irc client",
+  "homepage": "https://github.com/creesch/discordIRCd#readme",
+  "keywords": [
+    "discord",
+    "irc",
+    "ircd"
+  ],
+  "license": "MIT",
+  "main": "server.js",
+  "name": "discord-ircd",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/creesch/discordIRCd.git"
+  },
+  "scripts": {
+    "start": "node server.js"
+  },
+  "version": "0.5.0"
+}
