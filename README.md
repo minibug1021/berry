@@ -29,8 +29,8 @@ IRCUtils https://pypi.python.org/pypi/ircutils
 
 As well as Python 2.7
 
-=====
 For the Discord implementation, you also need the following
+=====
 
 discord.py https://pypi.python.org/pypi/discord.py/
 
