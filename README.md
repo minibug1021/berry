@@ -28,3 +28,14 @@ and
 IRCUtils https://pypi.python.org/pypi/ircutils
 
 As well as Python 2.7
+
+=====
+For the Discord implementation, you also need the following
+=====
+discord.py https://pypi.python.org/pypi/discord.py/
+
+asyncio https://pypi.python.org/pypi/asyncio/3.4.3
+
+node.js https://nodejs.org/en/
+
+Make sure to change the password in the config to the server id.
