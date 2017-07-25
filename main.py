@@ -196,7 +196,7 @@ if __name__ == "__main__":
     s.connect(
         config['server'].encode('ascii', 'replace'),
         channel=config['channels'].encode('ascii', 'replace'),
-        use_ssl=False)
+        use_ssl=False, password=config['password'].encode('ascii', 'replace'))
     s.lastloadconf = 0
     s.lastloadcommands = 0
     s.lastloadcustomcommands = 0
