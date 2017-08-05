@@ -333,11 +333,23 @@ class commands:
                 except:
                     self.send_message(event.respond, 'Command not found! Maybe github is down?')
 
-    def command_romaji(self, event):
-        '''Usage: ~romaji <arg> displays romaji for a given Japanese symbolic parameter.'''
-        param = unicode(event.params, "utf-8")
-        resp = romkan.to_roma(param)
-        self.send_message(event.respond, resp)
+    def command_ja(self, event):
+        '''Usage: ~ja <k/h/r> <arg> displays katakana/hiragana/romaji for a given argument, converting between romaji and kana'''
+        try:
+            dest, phrase = event.params.split(' ', 1)
+            dest = dest.lower()
+            if dest == 'k':
+                resp = romkan.to_katakana(phrase)
+            elif dest == 'h':
+                resp = romkan.to_hiragana(phrase)
+            elif dest == 'r':
+                resp = romkan.to_roma(phrase.decode('utf-8'))
+            else:
+                raise
+            self.send_message(event.respond, resp)
+        except:
+            self.send_message(event.respond, 'Invalid input, please check syntax.')
+            raise
 
     def command_tr(self, event):
         '''Usage: ~translate <LanguageFrom> <LanguageTo> translates a string of text between languages. Alternate usage is ~translate list, which allows you to view currently available languages.'''
