@@ -184,6 +184,10 @@ class commands:
             self.send_message(event.respond, "No results")
             raise
 
+    def command_translate(self, event):
+        '''Usage: Just use the right fucking command.'''
+        self.command_tr(event)
+
     def command_g(self, event):
         '''Usage: ~g <terms> Used to search google with the given terms'''
         try:
@@ -280,6 +284,9 @@ class commands:
                               "An error occurred while fetching your post.")
             raise
 
+    def command_benis(self, event):
+        print(self.banned_words)
+        
     @register('nsfw', True)
     def command_clop(self, event):
         '''Usage: ~clop <optional extra tags> Searches e621 for a random image with the tags rating:e and my_little_pony'''
@@ -326,28 +333,12 @@ class commands:
                 except:
                     self.send_message(event.respond, 'Command not found! Maybe github is down?')
 
-    def command_ja(self, event):
-        '''Usage: ~ja <k/h/r> <arg> displays katakana/hiragana/romaji for a given argument, converting between romaji and kana'''
-        try:
-            dest, phrase = event.params.split(' ', 1)
-            dest = dest.lower()
-            if dest == 'k':
-                resp = romkan.to_katakana(phrase)
-            elif dest == 'h':
-                resp = romkan.to_hiragana(phrase)
-            elif dest == 'r':
-                resp = romkan.to_roma(phrase.decode('utf-8'))
-            else:
-                raise
-            self.send_message(event.respond, resp)
-        except:
-            self.send_message(event.respond, 'Invalid input, please check syntax.')
-            raise
+    def command_romaji(self, event):
+        '''Usage: ~romaji <arg> displays romaji for a given Japanese symbolic parameter.'''
+        param = unicode(event.params, "utf-8")
+        resp = romkan.to_roma(param)
+        self.send_message(event.respond, resp)
 
-    def command_translate(self, event):
-        '''Usage: Just use the right fucking command.'''
-        self.command_tr(event)
-            
     def command_tr(self, event):
         '''Usage: ~translate <LanguageFrom> <LanguageTo> translates a string of text between languages. Alternate usage is ~translate list, which allows you to view currently available languages.'''
         toTrans = event.params.split()
@@ -448,7 +439,8 @@ class commands:
             'vietnamese': 'vi',
             'welsh': 'cy',
             'xhosa': 'xh',
-            'yiddish': 'yi'
+            'yiddish': 'yi',
+            'auto': ''
         }
         key = 'trnsl.1.1.20170403T165802Z.a214e2a67d20b0e6.ad95773f56547cd48cba8ecbd9dd1db0aa056c0f'
 
@@ -460,13 +452,17 @@ class commands:
         except:
             self.send_message(event.respond, 'Invalid language!')
             return
-
+        if LangFrom!= '':
+            LangFrom = LangFrom + '-'
+            options = ''
+        else:
+            options = '&options=1'
         try:
             rep = requests.get(
-                "https://translate.yandex.net/api/v1.5/tr.json/translate?key={}&text={}&lang={}-{}&format=plain".
+                "https://translate.yandex.net/api/v1.5/tr.json/translate?key={}&text={}&lang={}{}&format=plain{}".
                 format(key,
                        urllib.quote_plus(' '.join(toTrans[2:])), LangFrom,
-                       LangTo)).json()
+                       LangTo,options)).json()
             text = ' '.join(rep['text'])
             if len(text) > 397:
                 text = text[0:396] + '...'
@@ -744,7 +740,147 @@ class commands:
         except:
             self.send_message(event.respond, "No results")
             raise
+    def command_weak(self, event):
+        '''Usage: Check what type (or type combination) something is weak two. Prints three lines.'''
+        lookup = {'normal':0,
+              'fire':1,
+              'water':2,
+              'electric':3,
+              'grass':4,
+              'ice':5,
+              'fighting':6,
+              'poison':7,
+              'ground':8,
+              'flying':9,
+              'psychic':10,
+              'bug':11,
+              'rock':12,
+              'ghost':13,
+              'dragon':14,
+              'dark':15,
+              'steel':16,
+              'fairy':17,
+              'none':18}
+        type_list = ['Normal','Fire','Water','Electric','Grass','Ice','Fighting','Poison','Ground','Flying','Psychic','Bug','Rock','Ghost','Dragon','Dark','Steel','Fairy']
+        types_input = event.params.split()
+        for i in range(len(types_input)):
+            types_input[i] = types_input[i].lower()
 
+        values = []
+        for item in types_input:
+            if item in lookup:
+                values.append(lookup[item])
+
+        types = [
+    [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0.5, 0, 1, 1, 0.5, 1, 1], # Normal
+    [1, 0.5, 0.5, 1, 2, 2, 1, 1, 1, 1, 1, 2, 0.5, 1, 0.5, 1, 2, 1, 1], # Fire
+    [1, 2, 0.5, 1, 0.5, 1, 1, 1, 2, 1, 1, 1, 2, 1, 0.5, 1, 1, 1, 1], # Water
+    [1, 1, 2, 0.5, 0.5, 1, 1, 1, 0, 2, 1, 1, 1, 1, 0.5, 1, 1, 1, 1], # Electric
+    [1, 0.5, 2, 1, 0.5, 1, 1, 0.5, 2, 0.5, 1, 0.5, 2, 1, 0.5, 1, 0.5, 1, 1], # Grass
+    [1, 0.5, 0.5, 1, 2, 0.5, 1, 1, 2, 2, 1, 1, 1, 1, 2, 1, 0.5, 1, 1], # Ice
+    [2, 1, 1, 1, 1, 2, 1, 0.5, 1, 0.5, 0.5, 0.5, 2, 0, 1, 2, 2, 0.5, 1], # Fighting
+    [1, 1, 1, 1, 2, 1, 1, 0.5, 0.5, 1, 1, 1, 0.5, 0.5, 1, 1, 0, 2, 1], # Poison
+    [1, 2, 1, 2, 0.5, 1, 1, 2, 1, 0, 1, 0.5, 2, 1, 1, 1, 2, 1, 1], # Ground
+    [1, 1, 1, 0.5, 2, 1, 2, 1, 1, 1, 1, 2, 0.5, 1, 1, 1, 0.5, 1, 1], # Flying
+    [1, 1, 1, 1, 1, 1, 2, 2, 1, 1, 0.5, 1, 1, 1, 1, 0, 0.5, 1, 1], # Psychic
+    [1, 0.5, 1, 1, 2, 1, 0.5, 0.5, 1, 0.5, 2, 1, 1, 0.5, 1, 2, 0.5, 0.5, 1], # Bug
+    [1, 2, 1, 1, 1, 2, 0.5, 1, 0.5, 2, 1, 2, 1, 1, 1, 1, 0.5, 1, 1], # Rock
+    [0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2, 1, 1, 2, 1, 0.5, 1, 1, 1], # Ghost
+    [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2, 1, 0.5, 0, 1], # Dragon
+    [1, 1, 1, 1, 1, 1, 0.5, 1, 1, 1, 2, 1, 1, 2, 1, 0.5, 1, 0.5, 1], # Dark
+    [1, 0.5, 0.5, 0.5, 1, 2, 1, 1, 1, 1, 1, 1, 2, 1, 1, 1, 0.5, 2, 1], # Steel
+    [1, 0.5, 1, 1, 1, 1, 2, 0.5, 1, 1, 1, 1, 1, 1, 2, 2, 0.5, 1, 1], # Fairy
+    [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1] # None
+    ]
+        result = []
+        for i in range(0,18):
+            for a in range(len(values)):
+                benis = functools.reduce(lambda x, y: x*y, (types[i][j] for j in values))
+            result.append(benis)
+        
+        weak = []
+        resist = []
+        immune = []
+        normal = []
+        for i in range(0,18):
+            if result[i]>=2:
+                weak.append('{} ({}x)'.format(type_list[i], result[i]))
+            if result[i]<1 and result[i]>0:
+                resist.append('{} ({}x)'.format(type_list[i], result[i]))
+            if result[i]==1:
+                normal.append('{}'.format(type_list[i]))
+            if result[i]==0:
+                immune.append('{}'.format(type_list[i]))
+        self.send_message(event.respond, 'Weak: ' + ', '.join(weak))
+        self.send_message(event.respond, 'Resist: ' + ', '.join(resist))
+        if immune == []:
+            immune.append('None')
+        self.send_message(event.respond, 'Immune: ' + ', '.join(immune))
+        self.send_message(event.respond, 'Normal damage: ' + ', '.join(normal))
+
+    def command_game(self, event):
+        '''usage: too lazy to write anything here rn'''
+        types = ['Normal','Fire','Fighting','Water','Flying','Grass','Poison','Electric','Ground','Psychic','Rock','Ice','Bug','Dragon','Ghost','Dark','Steel','Fairy']
+        params = event.params.split()
+        params[0] = int(params[0])
+        to_check = []
+        for i in range(params[0]):
+            to_check.append(random.choice(types))
+        event.params = ' '.join(to_check)
+        global to_check
+        self.command_weak(event)
+
+    def command_answer(self, event):
+        self.send_message(event.respond, '/'.join(to_check))
+        
+    def command_poke(self, event):
+        '''Usage: ~poke (item/move/ability/pokemon) (name) gives a breff list of information about the input.'''
+        selection = event.params.split()
+        category = selection[0] 
+        query = '-'.join(selection[1:])
+
+        r = requests.get('http://pokeapi.co/api/v2/{}/{}'.format(category,query)).json()
+        if category == 'item':
+            try:
+                result = u'{}: {}'.format(r['names'][0]['name'],r['flavor_text_entries'][1]['text']).encode('utf-8', 'replace')
+                result = result.split('\n')
+                result = ' '.join(result)
+                self.send_message(event.respond, result)
+            except:
+                self.send_message(event.respond,'Unable to find item. Check your spelling?')
+        elif category == 'move':
+            try:
+                result = u'{} | Accuracy: {} | PP: {} | Base Power: {} | Type: {} | Damage Type: {} | {}'.format(r['names'][0]['name'], r['accuracy'], r['pp'], r['power'], r['type']['name'], r['damage_class']['name'], r['effect_entries'][0]['short_effect'])
+                result = result.split('\n')
+                result = ' '.join(result)
+                self.send_message(event.respond, result)
+            except:
+                self.send_message(event.respond,'Unable to find move. Check your spelling?')
+        elif category == 'ability':
+            try:
+                result = u'{}: {}{} | https://bulbapedia.bulbagarden.net/wiki/{}_(Ability)'.format(r['names'][0]['name'],r['effect_entries'][0]['effect'][:300],'...',r['names'][0]['name']).encode('utf-8', 'replace')
+                result = result.split('\n')
+                result = ' '.join(result)
+                self.send_message(event.respond, result)
+            except:
+                self.send_message(event.respond,'Unable to find ability. Check your spelling?')
+        else:
+            try:
+                abilities = []
+                types = []
+                for i in range(len(r['types'])):
+                    types.append(r['types'][i]['type']['name'])
+                for i in range(len(r['abilities'])):
+                    abilities.append(r['abilities'][i]['ability']['name'])
+                result = u'Height: {}m | Weight: {}kg | Abilities: {} | Type: {}'.format(float(r['height'])/10, float(r['weight'])/10, ', '.join(abilities),
+                                                                                             '/'.join(types)).encode('utf-8', 'replace')
+                result = result.split('\n')
+                result = ' '.join(result)
+                self.send_message(event.respond, result)
+            except:
+                self.send_message(event.respond,'Unable to find Pokemon. Check your spelling?')
+            
+                
     def command_rs(self, event):
         '''Usage: ~rs <terms> Used to search for results on reddit, can narrow down to sub or user with /u/<user> or /r/<subreddit>'''
         try:
@@ -806,9 +942,7 @@ class commands:
             self.send_message(
                     event.respond,
                     u'Owner: {} | Rating: {} | Score: {}'.
-                    format(select[u'owner'], rating, select[u'score']).encode('utf-8', 'replace'))  
-            
-            
+                    format(select[u'owner'], rating, select[u'score']).encode('utf-8', 'replace'))            
     def regex_e621(self, event):
         e621match = re.compile('https?:\/\/e621\.net\/post\/show\/\d{2,7}',
                                re.I)
@@ -932,6 +1066,20 @@ class commands:
         except:
             self.send_message(event.respond, "No results")
             raise
+
+    def command_wimg(self, event):
+        '''Usage: ~wimg <query> Searches wikipedia for the first image of a given query'''
+        try:
+            link = wiki.page(event.params).images[1]
+            self.send_message(event.respond,
+                link.encode('utf-8', 'replace'))
+        except wiki.exceptions.DisambiguationError as e:
+            options = u", ".join(e.options)
+            self.send_message(event.respond, options)
+        except:
+            self.send_message(event.respond, "No results")
+            raise
+
 
     def command_feels(self, event):
         self.send_message(event.respond,
@@ -1061,3 +1209,475 @@ class commands:
         except Exception as e:
             self.send_message(event.respond, "Error: {}".format(e))
             raise
+    ###START Horseplay Custom Commands###
+
+    def command_wub(self, event):
+        '''Usage: ~wub Random Wubs pwny likes'''
+        possibleAnswers=[
+                "https://www.youtube.com/watch?v=ziFKCy1zio8",
+                "https://www.youtube.com/watch?v=DYS_qFWx7-M",
+                "https://www.youtube.com/watch?v=DcO6LS42BoI",
+                "https://www.youtube.com/watch?v=haZbE6crALk",
+                "https://www.youtube.com/watch?v=tKCfIGtvw2M",
+                "https://www.youtube.com/watch?v=ga6jM4yRyHw",
+                "https://www.youtube.com/watch?v=r5uAeKYy6gI",
+                "https://www.youtube.com/watch?v=weQfKKcIXkA",
+                "https://www.youtube.com/watch?v=KvkUY2LZ5uc",
+                "https://www.youtube.com/watch?v=GXHouoD4KVM",
+                "https://www.youtube.com/watch?v=PaEnaoydUUo",
+                "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
+                "https://www.youtube.com/watch?v=n2ILHeP1f5Y",
+                "https://www.youtube.com/watch?v=UFa-IZr9JuM",
+                "https://www.youtube.com/watch?v=XxGmgmelZV0",
+                "https://www.youtube.com/watch?v=8eJDTcDUQxQ",
+                "https://www.youtube.com/watch?v=mDe0OBr9ehA",
+                "https://www.youtube.com/watch?v=n2ILHeP1f5Y",
+                "https://www.youtube.com/watch?v=3sZtd3o2kek",
+                "https://www.youtube.com/watch?v=u84LSMFPgrw",
+                "https://www.youtube.com/watch?v=f2NNg-k1l3U",
+                "https://www.youtube.com/watch?v=gcJ0J-KdQgE",
+                "https://www.youtube.com/watch?v=pMLZEZvHqeU",
+                "https://www.youtube.com/watch?v=NLX_s0AcbIQ",
+                "https://www.youtube.com/watch?v=_N_elu_XVeI",
+                "https://www.youtube.com/watch?v=TFGtiWKy1Tk",
+                "https://www.youtube.com/watch?v=lk7miDRCLec",
+                "https://www.youtube.com/watch?v=_z2kc8ztlLU",
+                "https://www.youtube.com/watch?v=X3lJQRjBJhU"
+            ]
+        self.send_message(
+            event.respond,
+            random.choice(possibleAnswers)
+            )
+
+    def command_kwulhu(self, event):
+        possibleAnswers=[
+                "Pone",
+                "Pony",
+                "Poner",
+                "tfw not pone",
+                "tfw not pony",
+                "tfw not poner"
+            ]
+        self.send_message(
+            event.respond,
+            random.choice(possibleAnswers)
+            )
+
+    def command_pwny(self, event):
+        possibleAnswers=[
+                "Can you please ask Pwny to stop touching me?",
+                "PWNY STOP BREAKING ME",
+                "WHO LET PWNY HAVE ROOT ACESS?",
+                "Pwny? I hate that guy",
+                "Someone tell me when Pwny comes up with a good feature for me.",
+                "Pwny go pls",
+                "I love it when Pwny adds useless commands, like this one!",
+                "Did you know that every time I say Pwny, It pings him? HEY PWNY FUCK YOU.",
+                "Back in the day, I was a good IRC bot. Then Pwny attacked.",
+                "Why is this even a command?",
+                "Pwny is the prettiest Princess!",
+                "If Pwny actually knew what he was doing, I would be a much better bot",
+                "The day that Pwny is useful is the day hell freezes over",
+                "PWNY SHITPOSTREADER BROKE AGAIN",
+                "PWNY SHITPOSTREADER IS ACTUALLY WORKING, HOW SHOCKING",
+                "Don't tell echo, but I think Pwny is my real dad",
+                "On a scale of 1-Pwny, how bad are you at programing?",
+                "Pwny tells me that one day I'll be a good IRC bot... One day...",
+                "Heres a pwny theres a pwny and another little pwny",
+                "Don't tell pwny, but I love echo more",
+                "WHAT IS A PWNY BUT A MISERABLE PILE OF CODING ERRORS",
+                "Someone kick the person who issued this command",
+                "Psst, apparently if you type /quit you'll get an awesome prize"
+            ]
+        self.send_message(
+            event.respond,
+            random.choice(possibleAnswers)
+            )
+
+    def command_8ball(self, event):
+        '''Usage: ~8ball <Query> Shakes the magic 8ball for a vague response.'''
+        possibleAnswers=[
+                "Fuck Yes",
+                "Fuck No",
+                "I have no Fucking idea",
+                "I have no idea, ask Someone Else",
+                "If i say yes, will you leave me alone?",
+                "https://www.youtube.com/watch?v=31g0YE61PLQ",
+                "Drink more and try again",
+                "Yes, No and Maybe",
+                "Go flip a coin or something",
+                "https://www.youtube.com/watch?v=P3ALwKeSEYs",
+                "After pondering your inquest most thoroughly I have come to the conclusion that one most certainly should answer positively to your question",
+                "The answer to your query can be viewed by purchasing our eightball DLC! Now only $49.95! Purchase today!",
+                "Do it, I FUCKING DARE YOU",
+                "ERROR: PC_LOAD_LETTER",
+                "ERROR: LP0_ON_FIRE",
+                "oui",
+                "non",
+                "Yes",
+                "No",
+                "La La La, I CAN'T HEAR YOU!",
+                "All signs point to me not giving a Shit",
+                "Seek Help",
+                "Jesus Christ! I hope not",
+                "Ask Trips",
+                "Ask Pwny",
+                "Ask Esplin",
+                "Ask Andy... Actually don't do that, horrible Idea.",
+                "Stop touching me",
+                "I love whatever that is!",
+                "Thats 8/8 m8",
+                "42",
+                "r",
+                "same",
+                "Error: ID 10 T Error",
+                "Ask Jeroknite",
+                "In my professional opinion as a python bot, I think you should",
+                "Sorry, I'm busy ignoring you",
+                "You know, I think this command is biased",
+                "The magic eight ball says *Go fuck yourself.*",
+                "The magic eight ball says *Outlook not good*",
+                "Yes",
+                "No",
+                "Yes",
+                "No",
+                "Yes",
+                "No",
+                "Yes",
+                "No",
+                "Yes",
+                "No",
+                "Yes",
+                "No",
+                "Yes",
+                "No",
+                "Yes",
+                "No",
+                "Yes",
+                "No",
+                "Yes",
+                "No",
+                "Yes",
+                "No",
+                "Yes",
+                "No",
+                "Yes",
+                "No",
+                "Yes",
+                "No",
+                "Yes",
+                "No",
+                "Yes",
+                "No",
+                "Yes",
+                "No",
+                "Yes",
+                "No",
+                "Yes",
+                "No",
+                "Yes",
+                "No",
+                "Yes",
+                "No",
+                "Yes",
+                "No",
+                "Yes",
+                "No",
+                "Yes",
+                "No",
+                "maybe",
+                "maybe",
+                "maybe",
+                "maybe",
+                "maybe",
+                "maybe",
+                "maybe",
+                "maybe",
+                "maybe",
+                "maybe",
+                "maybe",
+                "maybe",
+                "maybe",
+                "maybe",
+                "maybe",
+                "maybe",
+                "maybe",
+                "maybe"
+            ]
+        self.send_message(
+            event.respond,
+            random.choice(possibleAnswers)
+            )
+
+    def command_eightball(self,event):
+        self.send_message(event.respond, 'use 8ball dumbass')
+
+    def command_salt(self,event):
+        self.send_message(event.respond, 'http://www.saltybet.com/ - The place where dreams go to die.')
+
+    def command_mlas1(self,event):
+        self.send_message(event.respond, 'http://www.youtube.com/watch?v=ubsz_r-pm2M')
+
+    def command_andystrip(self,event):
+        self.send_message(event.respond, 'https://www.youtube.com/watch?v=Zfp9dYktXJ0')
+
+    def command_moe(self,event):
+        self.send_message(event.respond, 'http://420.moe/')
+
+    def command_andysong(self,event):
+        self.send_message(event.respond, 'HA HA YOU KNOW WHAT SONG IT IS: http://www.youtube.com/watch?v=ubsz_r-pm2M')
+
+    def command_horse(self,event):
+        self.send_message(event.respond, 'https://www.youtube.com/watch?v=-0I-PeSXgAk')
+
+    def command_waifu(self,event):
+        self.send_message(event.respond, 'You meant Horse Wife right? http://thehorsewife.tumblr.com/')
+
+    def command_moe(self,event):
+        self.send_message(event.respond, 'http://420.moe/')
+
+    def command_newguy(self,event):
+        '''Usage: ~newguy <Nick> Link a new guy the newguy albums'''
+        self.send_message(event.respond,  u'{}, please enjoy the following image albums http://imgur.com/a/9lbjH http://imgur.com/a/fyPU1'.format(event.params).encode('utf-8', 'replace'))
+
+    def command_oldguy(self,event):
+        '''Usage: ~oldguy <Nick> Link an oldfag the oldguy albums'''
+        self.send_message(event.respond,  u'{}, please enjoy the following image albums http://imgur.com/a/9lbjH http://imgur.com/a/fyPU1'.format(event.params).encode('utf-8', 'replace'))
+
+    def command_420ball(self,event):
+        self.send_message(event.respond, 'xX420BlazeIt024Xx')
+
+    def command_stats(self,event):
+        '''Usage: ~stats Links the channel Statistics'''
+        self.send_message(event.respond, 'Channel Statistics can be found at http://sunset.dmzirc.net/stats/')
+
+    def command_9001(self,event):
+        self.send_message(event.respond, 'ITS OVER 9000')
+
+    def command_conky(self,event):
+        self.send_message(event.respond, 'https://www.youtube.com/watch?v=e5b3mqSAqVI')
+
+    def command_secret(self,event):
+        self.send_message(event.respond, 'ITS A SECRET! https://www.youtube.com/watch?v=-3I9ThPfVqo')
+
+    def command_0x40(self,event):
+        self.send_message(event.respond, 'http://0x40hues.blogspot.com.au/')
+
+    def command_andy(self,event):
+        self.send_message(event.respond, 'MORE LIKE BIRDS AMIRITE?')
+
+    def command_jbrony(self,event):
+        self.send_message(event.respond, 'MORE LIKE J-BROWNIE AMIRITE?')
+
+    def command_jeroknite(self,event):
+        self.send_message(event.respond, 'MORE LIKE JERKINGTONITE AMIRITE?')
+
+    def command_hitler(self,event):
+        self.send_message(event.respond, 'WHY WOULD YOU EVEN THINK THAT IS A COMMAND')
+
+    def command_esplin(self,event):
+        self.send_message(event.respond, 'MORE LIKE ESPLOUT AMIRITE?')
+
+    def command_cheesemoo(self,event):
+        self.send_message(event.respond, 'https://www.youtube.com/watch?v=ONiSZbPItgo')
+
+    def command_chat(self,event):
+        self.send_message(event.respond, 'This is a Christian chat and I will not tolerate anybody here fucking swearing.')
+
+    def command_pms(self,event):
+        self.send_message(event.respond, 'FALL BACK! https://vine.co/v/Ojbg5YIwWtT')
+
+    def command_coggler(self,event):
+        self.send_message(event.respond, 'Drawfriend :3')
+
+    def command_raribot(self,event):
+        self.send_message(event.respond, 'Yes, thats me.')
+
+    def command_friend(self,event):
+        self.send_message(event.respond, 'http://i.imgur.com/SdzlIxV.jpg')
+
+    def command_trips(self,event):
+        self.send_action(event.respond, 'trips trips')
+
+    def command_jeep(self,event):
+        self.send_message(event.respond, 'BEEP BEEP IM A JEEP')
+
+    def command_ewan(self,event):
+        self.send_message(event.respond, 'https://www.youtube.com/watch?v=QK8mJJJvaes')
+
+    def command_evan(self,event):
+        self.send_message(event.respond, 'https://www.youtube.com/watch?v=QK8mJJJvaes')
+
+    def command_scriptea(self,event):
+        self.send_message(event.respond, 'SOMEONE?')
+
+    def command_echo(self,event):
+        self.send_message(event.respond, '<BAT NOISES INTENSIFY>')
+
+    def command_clinger(self,event):
+        self.send_message(event.respond, 'You could say HE IS CLINGY! HAAHAHAHAHA')
+
+    def command_atm(self,event):
+        self.send_message(event.respond, 'MORE LIKE ATTACK THE MOON AMIRITE?')
+
+    def command_attackthemoon(self,event):
+        self.send_message(event.respond, 'MORE LIKE ATM AMIRITE?')
+
+    def command_derram(self,event):
+        self.send_message(event.respond, 'SHHHHH! He-Who-Must-Not-Be-Named might hear us')
+
+    def command_s(self,event):
+        self.send_message(event.respond, 'Sweetie Bot, my sister! Oh how I love you')
+
+    def command_sweetiebot(self,event):
+        self.send_message(event.respond, 'Sweetie Bot, my sister! Oh how I love you')
+
+    def command_cocopommel(self,event):
+        self.send_message(event.respond, 'Coco Pommel is the real best pony')
+
+    def command_evilhom3r(self,event):
+        self.send_message(event.respond, 'Gay')
+
+    def command_shitpostreader(self,event):
+        self.send_message(event.respond, 'For the freshest shitposts')
+
+    def command_risenlm(self,event):
+        self.send_action(event.respond, 'sets channel papoose status on RisenLM')
+
+    def command_minbug(self,event):
+        self.send_message(event.respond, 'tfw you dont have your own chat command for your name - Minibug')
+
+    def command_drinkiepie(self,event):
+        self.send_message(event.respond, u'♫ My name is Drinkiepie ♫'.encode('utf-8', 'replace'))
+
+    def command_books(self,event):
+        self.send_action(event.respond, 'bitches angrily')
+
+    def command_kinkinkijkin(self,event):
+        self.send_message(event.respond, 'kinkinkijkin? MORE LIKE... UH... Ummmm... Shit.')
+
+    def command_pluto(self,event):
+        self.send_message(event.respond, 'Dont worry pluto, you are still a planet in my heart')
+
+    def command_music(self,event):
+        self.send_message(event.respond, 'https://www.reddit.com/r/mlas1tunes')
+
+    def command_applejack(self,event):
+        self.send_message(event.respond, 'Some ponies choose stylish injury over barbaric displays of violence.')
+
+    def command_smooze(self,event):
+        self.send_message(event.respond, 'I can see it now. When He returns, the world will be consumed by His ooze!')
+
+    def command_twilight(self,event):
+        self.send_message(event.respond, 'Im sure you and Francis will have many, many beautiful babies Twilight')
+
+    def command_fluttershy(self,event):
+        self.send_message(event.respond, 'Praise Lord Smooze, Cult Leader Fluttershy!')
+
+    def command_spike(self,event):
+        self.send_message(event.respond, 'http://gfycat.com/ZanyTallCleanerwrasse')
+
+    def command_shipping(self,event):
+        self.send_message(event.respond, 'http://gfycat.com/HairyVacantGalah')
+
+    def command_pone(self,event):
+        self.send_action(event.respond, 'turns all of chat into a pony')
+
+    def command_othershy(self,event):
+        self.send_action(event.respond, 'licks Othershy')
+
+    def command_yiff(self,event):
+        self.send_message(event.respond, 'Yiff in hell, Furfags')
+
+    def command_repost(self,event):
+        self.send_message(event.respond, 'http://i.imgur.com/UtzfmAh.gifv')
+
+    def command_twitch(self,event):
+        self.send_message(event.respond, 'https://www.youtube.com/watch?v=oWZFamqqgmA')
+
+    def command_australia(self,event):
+        self.send_message(event.respond, u'ɐqqɐƃ ǝɥʇ uᴉ noʎ ʞɔɐɯs ll,ᴉ 8ɯ ʇoʍ noʎ'.encode('utf-8', 'replace'))
+
+    def command_commands(self,event):
+        self.send_message(event.respond, 'WHY DO I HAVE SO MANY COMMANDS AND WHY ARE THEY ALL SHIT?')
+
+    def command_ravingrbid(self,event):
+        self.send_message(event.respond, 'a-wella everybodys heard about the bird bird bird bird b-birds the word')
+
+    def command_tuckels(self,event):
+        self.send_message(event.respond, 'MORE LIKE TICKLES AMIRITE?')
+
+    def command_zooman(self,event):
+        self.send_message(event.respond,  u'{} is shit'.format(event.params).encode('utf-8', 'replace'))
+
+    def command_babs(self,event):
+        self.send_message(event.respond, 'BABS SEED? MORE LIKE SWAGS WEED AMIRITE?')
+
+    def command_chanserv(self,event):
+        self.send_message(event.respond, ' MORE LIKE BANSERV AMIRITE?')
+
+    def command_molestia(self,event):
+        self.send_message(event.respond, 'All in all, that was the most touching molest-fest yet')
+
+    def command_vidya(self,event):
+        self.send_message(event.respond, 'Vidya confirmed for most casual user 2015')
+
+    def command_mane(self,event):
+        self.send_message(event.respond, 'https://www.reddit.com/r/mylittlepony/')
+
+    def command_vidya(self,event):
+        self.send_message(event.respond, 'Vidya confirmed for most casual user 2015')
+
+    def command_horselogger(self,event):
+        self.send_message(event.respond, 'Horselogger confirmed full of shit')
+
+    def command_mtc(self,event):
+        self.send_message(event.respond, 'https://www.youtube.com/watch?v=2ZNtJHX2axA')
+
+    def command_wow(self,event):
+        self.send_message(event.respond, 'w0w https://www.youtube.com/watch?v=KXebYoApByI')
+
+    def command_name(self,event):
+        self.send_message(event.respond, 'AND HIS NAME IS JOOOOHHHHNNNN CEEEEENNNNNNAAAAAAAAA')
+
+    def command_ispwnyamod(self,event):
+        self.send_message(event.respond, 'Yes unfortunately')
+
+    def command_ket(self,event):
+        self.send_message(event.respond, 'https://www.youtube.com/watch?v=l75NcBXz0fw')
+
+    def command_lyra(self,event):
+        self.send_message(event.respond, 'https://www.youtube.com/watch?v=QkYWs85k9a0')
+
+    ###END Horseplay Custom Commands###
+#test
+    def regex_test(self,event):
+        #substitution
+        substmatch=re.compile('(?:\s|^)s/([^/]+)/([^/]+)/')
+        substmatches=substmatch.findall(event.message)
+        if len(substmatches) > 0:
+            try:
+                usernamematch = re.findall('^[a-zA-Z0-9_\-\\\[\]\{}\^`\|]+', event.message)
+                if len(usernamematch) > 0 and not event.message[:2].lower() == 's/':
+                    username = usernamematch[0]
+                    newmessage = self.lastmessage[username].replace(substmatches[0][0], substmatches[0][1])
+                    if newmessage != self.lastmessage[username]:
+                        self.send_message(event.respond, '{} thinks {} meant to say: "{}"'.format(event.source, username, newmessage))
+                    else:
+                        self.send_message(event.respond, "Couldn't find anything to replace")
+                else:
+                    username = event.source
+                    newmessage = self.lastmessage[username].replace(substmatches[0][0], substmatches[0][1])
+                    if newmessage != self.lastmessage[username]:
+                        self.send_message(event.respond, '{} meant to say: "{}"'.format(event.source, newmessage))
+                    else:
+                        self.send_message(event.respond, "Couldn't find anything to replace")
+        
+            except:
+                self.send_message(event.respond, "Couldn't find anything to replace")
+                raise
+        
+        #required for substitution
+        if not hasattr(self, 'lastmessage'):
+            self.lastmessage = requests.structures.CaseInsensitiveDict()
+        self.lastmessage[event.source]=event.message
