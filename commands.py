@@ -836,14 +836,21 @@ class commands:
         params = event.params.split()
         params[0] = int(params[0])
         to_check = []
+        global to_check
         for i in range(params[0]):
             to_check.append(random.choice(types))
         event.params = ' '.join(to_check)
-        global to_check
         self.command_weak(event)
 
     def command_answer(self, event):
-        self.send_message(event.respond, '/'.join(to_check))
+        '''Usage: Answer the pokemon type game. Answer in the form of Type1/Type2 etc. Force display correct answer with !answer force'''
+        answer = '/'.join(to_check)
+        if event.params == 'force':
+            self.send_message(event.respond, 'Answer is '+answer)
+        elif event.params == answer:
+            self.send_message(event.respond, 'Correct. Answer is '+answer)
+        else:
+            self.send_message(event.respond, 'Incorrect. Guess again!')
         
     def command_poke(self, event):
         '''Usage: ~poke (item/move/ability/pokemon) (name) gives a breff list of information about the input.'''
