@@ -566,16 +566,14 @@ class commands:
         '''Usage: ~imdb <movie title> Provides basic information of a given movie, if applicable.'''
 	try:
 		t = requests.get(
-						'https://www.googleapis.com/customsearch/v1',
-						params=dict(
-							q='site:imdb.com {}'.format(event.params),
-							cx=self.config['googleengine'],
-							key=self.config['googleKey'],
-							safe='off')).json()
+			'https://www.googleapis.com/customsearch/v1',
+			params=dict(
+				q='site:imdb.com {}'.format(event.params),
+				cx=self.config['googleengine'],
+				key=self.config['googleKey'],
+				safe='off')).json()
 		link = requests.get(t['items'][0]['link']).text
-		
 		parsed = html.fromstring(link)
-		
 		def xpath(page, expr, process=lambda x: x.text, index=0):
 			try:
 				return process(page.xpath(expr)[index])
